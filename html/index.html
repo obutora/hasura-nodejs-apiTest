@@ -22,19 +22,29 @@
     </article>
 
     <script>
-        async function getSellsByBlock(blockName) {
-            const param = {
+        function createParam(body) {
+            return {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    block: blockName,
-                })
+                body: JSON.stringify(body)
             }
 
-            const result = await fetch('http://localhost:3000/block', param)
+        }
+
+        async function getSellsByBlock(blockName) {
+            const result = await fetch('http://localhost:3000/block', createParam({
+                block: blockName,
+            }))
+            return result.json()
+        }
+
+        async function getSellsByStore(storeName) {
+            const result = await fetch('http://localhost:3000/store', createParam({
+                store: storeName,
+            }))
             return result.json()
         }
 
@@ -46,8 +56,20 @@
                     this.sell = sell
             }
 
-            static async toStoreSellLst(blockName) {
+            static async toStoreSellByBlock(blockName) {
                 const sellList = await getSellsByBlock(blockName)
+
+                let results = []
+
+                sellList.forEach(e => {
+                    results.push(new StoreSell(e.Block, e.Store, e.Date, e.Sell))
+                });
+
+                return results
+            }
+
+            static async toStoreSellByStore(storeName) {
+                const sellList = await getSellsByStore(storeName)
 
                 let results = []
 
@@ -59,8 +81,10 @@
             }
         }
 
-        let sell = StoreSell.toStoreSellLst('都城')
-            .then(sell => sell.filter(storeSell => storeSell.store === 'たかお店'))
+
+        //------------------------------------------------------
+
+        let sell = StoreSell.toStoreSellByStore('たかお店')
             .then(sell => {
 
                 let nowValue = 250000;
