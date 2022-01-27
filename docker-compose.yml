@@ -34,6 +34,7 @@ services:
     image: node:latest
     environment:
       - DEBUG=node:*
+      - CHOKIDAR_USEPOLLING=1 # nodemon を入れていても、この環境変数がないとhot reloadできない
     restart: always
     tty: true
     # ホスト側のポート:コンテナのポート
@@ -45,7 +46,7 @@ services:
     # 起動時のカレントフォルダを指定
     working_dir: /app
     # 起動後に実行するコマンドを指定
-    command: npm start
+    command: npm run devstart
 
 volumes:
   db_data:
